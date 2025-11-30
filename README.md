@@ -64,8 +64,9 @@ Timers only advance based on the `dt_ms` parameter passed to each scan, not wall
 ## Project Structure
 
 ```
-plc-microscan-engine/
+PLC_Scan_Engine/
   main.py                 # CLI entrypoint
+  requirements.txt        # Python dependencies
   plc_engine/
     __init__.py
     tags.py               # Tag database (BoolTag, TimerTag, TagDB)
@@ -76,6 +77,18 @@ plc-microscan-engine/
   examples/
     seal_in.py            # Classic start/stop seal-in circuit
     motor_start_with_permissives.py  # Motor with safety permissives and timer
+  web/
+    __init__.py
+    app.py                # Flask web application
+    state_adapter.py      # State serialization for web API
+    templates/
+      base.html           # Base HTML template
+      index.html          # Main UI page
+    static/
+      css/
+        style.css         # UI styling
+      js/
+        ui.js             # Client-side logic
   tests/
     test_timers.py        # Timer behavior tests
     test_seal_in.py       # Seal-in circuit tests
@@ -89,7 +102,7 @@ plc-microscan-engine/
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install pytest
+pip install -r requirements.txt
 ```
 
 ### Run Examples
@@ -107,6 +120,72 @@ python main.py --demo motor
 ```bash
 pytest
 ```
+
+## Web UI
+
+The PLC MicroScan Engine includes a Flask-based web interface for interactive simulation and visualization.
+
+### Features
+
+- **Live Tag Visualization**: View all boolean and timer tags in real-time
+- **Interactive Controls**: Toggle input bits with a single click
+- **Scan Control**: Step through individual scans or run multiple scans at once
+- **Demo Switching**: Switch between seal-in and motor permissive demos
+- **Clean Interface**: Portfolio-ready UI with responsive design
+
+### Running the Web UI
+
+```bash
+# Install dependencies (if not already done)
+pip install -r requirements.txt
+
+# Run the Flask app
+python -m web.app
+
+# Or using Flask CLI
+FLASK_APP=web.app flask run
+```
+
+Then open your browser to: **http://localhost:5000/**
+
+### Using the Web UI
+
+1. **Select Demo**: Choose between "Seal-In" or "Motor + Permissives" from the dropdown
+2. **View State**: The tables show current values of all boolean and timer tags
+3. **Toggle Inputs**: Click "Toggle" buttons to change input tag values
+4. **Step Execution**: Click "Step" to execute a single 100ms scan cycle
+5. **Run Multiple Scans**: Click "Run 50 steps" to execute 50 scan cycles (5 seconds simulation time)
+6. **Refresh**: Click "Refresh" to update the display with current values
+
+### Understanding the Tables
+
+**Boolean Tags Table:**
+- **Name**: Tag identifier
+- **Value**: Current state (TRUE/FALSE)
+  - Green = TRUE (energized)
+  - Gray = FALSE (de-energized)
+- **Toggle**: Button to flip the tag value
+
+**Timer Tags Table:**
+- **Name**: Timer identifier
+- **EN**: Enable bit (timer is running)
+- **DN**: Done bit (timer has reached preset)
+- **TT**: Timing bit (timer is actively timing)
+- **ACC (ms)**: Accumulated time in milliseconds
+- **PRE (ms)**: Preset time in milliseconds
+
+### Demo Behaviors
+
+**Seal-In Demo:**
+1. Toggle `StartPB` to TRUE and step → `MotorRun` becomes TRUE
+2. Toggle `StartPB` back to FALSE and step → `MotorRun` stays TRUE (sealed in)
+3. Toggle `StopPB` to FALSE (NC contact opens) and step → `MotorRun` becomes FALSE
+
+**Motor + Permissives Demo:**
+1. Set all permissives (`StartCmd`, `EStopOK`, `Permissive1OK`, `Permissive2OK`) to TRUE
+2. Click "Run 50 steps" to simulate 5 seconds
+3. Watch the timer accumulate and `MotorRun` activate when timer completes
+4. Toggle `EStopOK` to FALSE and step → `MotorRun` immediately stops
 
 ## Example: Seal-In Circuit
 

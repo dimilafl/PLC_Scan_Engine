@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="controls">
+  <div class="control-group">
+    <label for="demo-select">Demo:</label>
+    <select id="demo-select">
+      <option value="seal_in" {% if current_demo == "seal_in" %}selected{% endif %}>Seal-In</option>
+      <option value="motor" {% if current_demo == "motor" %}selected{% endif %}>Motor + Permissives</option>
+    </select>
+  </div>
+
+  <div class="control-buttons">
+    <button id="btn-refresh" class="btn">Refresh</button>
+    <button id="btn-step" class="btn btn-primary">Step (100 ms)</button>
+    <button id="btn-run" class="btn btn-success">Run 50 steps</button>
+  </div>
+</section>
+
+<section id="bools-section">
+  <h2>Boolean Tags</h2>
+  <table id="bools-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Toggle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- filled by JS -->
+    </tbody>
+  </table>
+</section>
+
+<section id="timers-section">
+  <h2>Timer Tags</h2>
+  <table id="timers-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>EN</th>
+        <th>DN</th>
+        <th>TT</th>
+        <th>ACC (ms)</th>
+        <th>PRE (ms)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- filled by JS -->
+    </tbody>
+  </table>
+</section>
+{% endblock %}
